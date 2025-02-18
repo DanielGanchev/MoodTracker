@@ -20,6 +20,7 @@ interface ScaleGraphProps {
   color?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CustomTooltipProps = TooltipProps<any, any> & {
   dataKey?: keyof MoodEntry
   graphLabel?: string
