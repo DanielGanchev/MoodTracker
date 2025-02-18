@@ -16,7 +16,16 @@ interface SleepGraphProps {
   entries: MoodEntry[]
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+  active?: boolean
+  payload?: Array<{
+    value: number
+    payload: MoodEntry
+  }>
+  label?: string | null
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     const entry = payload[0].payload
     return (
@@ -25,10 +34,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           Sleep Quality: {entry.sleepQuality}
         </div>
         <div className="mt-1 text-xs text-white/60">
-          {new Date(label).toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-          })}
+          {label &&
+            typeof label === 'string' &&
+            new Date(label).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+            })}
         </div>
       </div>
     )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { MoodEntry, MoodRating } from '@/types'
+import { MoodEntry } from '@/types'
 
 interface StatsViewProps {
   entries: MoodEntry[]

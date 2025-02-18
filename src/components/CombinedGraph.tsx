@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { MoodEntry, getMoodEmoji } from '@/types'
+import { MoodEntry } from '@/types'
 import {
   LineChart,
   Line,

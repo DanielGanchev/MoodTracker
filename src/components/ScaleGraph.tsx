@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  TooltipProps as RechartsTooltipProps,
 } from 'recharts'
 
 interface ScaleGraphProps {
@@ -19,19 +20,31 @@ interface ScaleGraphProps {
   color?: string
 }
 
-const CustomTooltip = ({ active, payload, label, dataKey, graphLabel }: any) => {
-  if (active && payload && payload.length) {
-    const value = payload[0].value
+interface CustomTooltipProps
+  extends Omit<RechartsTooltipProps<any, any>, 'dataKey'> {
+  dataKey?: keyof MoodEntry
+  graphLabel?: string
+}
+
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  graphLabel,
+}: CustomTooltipProps) => {
+  if (active && payload && payload.length && label) {
+    const value = payload[0].value as number
     return (
       <div className="rounded-lg border border-purple-700 bg-purple-950 p-2 shadow-lg">
         <div className="text-sm text-white">
           {graphLabel}: {value}
         </div>
         <div className="mt-1 text-xs text-white/60">
-          {new Date(label).toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-          })}
+          {label &&
+            new Date(label).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+            })}
         </div>
       </div>
     )
@@ -39,7 +52,12 @@ const CustomTooltip = ({ active, payload, label, dataKey, graphLabel }: any) => 
   return null
 }
 
-const ScaleGraph = ({ entries, dataKey, label, color = '#a855f7' }: ScaleGraphProps) => {
+const ScaleGraph = ({
+  entries,
+  dataKey,
+  label,
+  color = '#a855f7',
+}: ScaleGraphProps) => {
   const graphData = useMemo(() => {
     return entries
       .sort(
@@ -80,7 +98,11 @@ const ScaleGraph = ({ entries, dataKey, label, color = '#a855f7' }: ScaleGraphPr
             stroke="#ffffff60"
             tick={{ fill: '#ffffff60' }}
           />
-          <Tooltip content={(props) => CustomTooltip({ ...props, dataKey, graphLabel: label })} />
+          <Tooltip
+            content={(props) =>
+              CustomTooltip({ ...props, dataKey, graphLabel: label })
+            }
+          />
           <Line
             type="monotone"
             dataKey={dataKey}
