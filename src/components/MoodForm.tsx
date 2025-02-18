@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MoodEntry, MoodRating, SleepQuality, getMoodEmoji } from '@/types'
+import { MoodEntry, MoodRating, getMoodEmoji } from '@/types'
 
 interface MoodFormProps {
   selectedMood: MoodRating

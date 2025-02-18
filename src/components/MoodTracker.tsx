@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { MoodEntry, MoodRating, getMoodLabel, getMoodEmoji } from '@/types'
 import useMoodEntries from '@/hooks/useMoodEntries'
 import MoodForm from './MoodForm'

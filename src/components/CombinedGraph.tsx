@@ -38,12 +38,24 @@ const metrics = {
 
 type MetricKey = keyof typeof metrics
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
+interface TooltipProps {
+  active?: boolean
+  payload?: Array<{
+    dataKey: MetricKey
+    value: number
+    payload: {
+      [key in MetricKey]: number
+    }
+  }>
+  label?: string | null
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
+  if (active && payload && payload.length && label) {
     return (
       <div className="rounded-lg border border-pink-light bg-pink-dark p-2 shadow-lg">
-        {payload.map((item: any) => {
-          const metricKey = item.dataKey as MetricKey
+        {payload.map((item) => {
+          const metricKey = item.dataKey
           return (
             <div key={metricKey} className="flex items-center gap-2">
               <div
