@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps as RechartsTooltipProps,
+  TooltipProps,
 } from 'recharts'
 
 interface ScaleGraphProps {
@@ -20,8 +20,7 @@ interface ScaleGraphProps {
   color?: string
 }
 
-interface CustomTooltipProps
-  extends Omit<RechartsTooltipProps<any, any>, 'dataKey'> {
+type CustomTooltipProps = TooltipProps<any, any> & {
   dataKey?: keyof MoodEntry
   graphLabel?: string
 }
@@ -32,8 +31,8 @@ const CustomTooltip = ({
   label,
   graphLabel,
 }: CustomTooltipProps) => {
-  if (active && payload && payload.length && label) {
-    const value = payload[0].value as number
+  if (active && payload?.[0]) {
+    const value = Number(payload[0].value)
     return (
       <div className="rounded-lg border border-purple-700 bg-purple-950 p-2 shadow-lg">
         <div className="text-sm text-white">
@@ -99,9 +98,15 @@ const ScaleGraph = ({
             tick={{ fill: '#ffffff60' }}
           />
           <Tooltip
-            content={(props) =>
-              CustomTooltip({ ...props, dataKey, graphLabel: label })
-            }
+            content={({ active, payload, label }) => (
+              <CustomTooltip
+                active={active}
+                payload={payload}
+                label={label}
+                dataKey={dataKey}
+                graphLabel={label}
+              />
+            )}
           />
           <Line
             type="monotone"
