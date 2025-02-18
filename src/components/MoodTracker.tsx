@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { MoodEntry, MoodRating, getMoodLabel, getMoodEmoji } from '@/types'
-import { useMoodEntries } from '@/hooks/useMoodEntries'
+import useMoodEntries from '@/hooks/useMoodEntries'
 import MoodForm from './MoodForm'
 import CalendarView from './CalendarView'
 import StatsView from './StatsView'

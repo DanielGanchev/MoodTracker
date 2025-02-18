@@ -5,15 +5,15 @@ import { MoodEntry } from '@/types'
 
 const STORAGE_KEY = 'mood-tracker-entries'
 
-export const useMoodEntries = () => {
+export default function useMoodEntries() {
   const [entries, setEntries] = useState<MoodEntry[]>(() => {
     if (typeof window === 'undefined') return []
-    const saved = localStorage.getItem('mood-tracker-entries')
+    const saved = localStorage.getItem(STORAGE_KEY)
     return saved ? JSON.parse(saved) : []
   })
 
   useEffect(() => {
-    localStorage.setItem('mood-tracker-entries', JSON.stringify(entries))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
   }, [entries])
 
   const addEntry = (entry: Omit<MoodEntry, 'id'>) => {
@@ -26,9 +26,7 @@ export const useMoodEntries = () => {
 
   const updateEntry = (updatedEntry: MoodEntry) => {
     setEntries((prev) =>
-      prev.map((entry) =>
-        entry.id === updatedEntry.id ? updatedEntry : entry
-      )
+      prev.map((entry) => (entry.id === updatedEntry.id ? updatedEntry : entry))
     )
   }
 
