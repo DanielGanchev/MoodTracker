@@ -6,24 +6,25 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const { signIn } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage('')
     try {
       await signIn(username, password)
-    } catch (error) {
-      setError('Invalid username or password')
+    } catch (err) {
+      setErrorMessage('Invalid username or password')
     }
   }
 
   return (
     <div className="w-full max-w-md bg-pink-dark rounded-3xl p-6 space-y-8">
       <h1 className="text-2xl font-bold text-white text-center">Login</h1>
-      {error && (
+      {errorMessage && (
         <div className="bg-red-500/20 text-red-200 p-3 rounded-lg text-sm">
-          {error}
+          {errorMessage}
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-6">

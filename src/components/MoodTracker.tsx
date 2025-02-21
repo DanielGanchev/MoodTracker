@@ -7,10 +7,12 @@ import MoodForm from './MoodForm'
 import CalendarView from './CalendarView'
 import StatsView from './StatsView'
 import GraphsView from './GraphsView'
+import { useAuth } from '@/contexts/AuthContext'
 
 type View = 'mood' | 'calendar' | 'stats' | 'graphs'
 
 const MoodTracker = () => {
+  const { signOut } = useAuth()
   const [selectedMood, setSelectedMood] = useState<MoodRating | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [currentView, setCurrentView] = useState<View>('mood')
@@ -125,6 +127,14 @@ const MoodTracker = () => {
       default:
         return (
           <div className="w-full max-w-md bg-pink-dark rounded-3xl p-6 space-y-8">
+            <div className="flex justify-end">
+              <button
+                onClick={signOut}
+                className="text-white/60 hover:text-white transition-colors text-sm"
+              >
+                Logout
+              </button>
+            </div>
             <h1 className="text-2xl font-bold text-white text-center">
               How Do You Feel Today?
             </h1>
