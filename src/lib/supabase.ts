@@ -21,6 +21,7 @@ export const supabase = createClient(
 )
 
 // Helper to convert snake_case to camelCase
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const toCamelCase = <T extends Record<string, any>>(obj: T): any => {
   const newObj: any = {}
   Object.keys(obj).forEach((key) => {
@@ -39,6 +40,7 @@ const toSnakeCase = <T extends Record<string, any>>(obj: T): any => {
   })
   return newObj
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export { toCamelCase, toSnakeCase }
 
