@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { MoodEntry } from '@/types'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,13 +10,7 @@ export default function useMoodEntries() {
   const [entries, setEntries] = useState<MoodEntry[]>([])
   const { profile } = useAuth()
 
-  useEffect(() => {
-    if (profile) {
-      fetchEntries()
-    }
-  }, [profile])
-
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async () => {
     if (!profile) return
     const { data, error } = await supabase
       .from('mood_entries')
@@ -30,7 +24,13 @@ export default function useMoodEntries() {
     }
 
     setEntries(data?.map(toCamelCase) || [])
-  }
+  }, [profile])
+
+  useEffect(() => {
+    if (profile) {
+      fetchEntries()
+    }
+  }, [profile, fetchEntries])
 
   const addEntry = async (entry: Omit<MoodEntry, 'id'>) => {
     if (!profile) return

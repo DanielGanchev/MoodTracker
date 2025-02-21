@@ -22,6 +22,12 @@ interface CombinedGraphProps {
   }>
 }
 
+interface TooltipPayload {
+  name: string
+  value: number
+  color: string
+}
+
 const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
   const graphData = useMemo(() => {
     return entries
@@ -70,7 +76,7 @@ const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
                         day: 'numeric',
                       })}
                     </div>
-                    {payload.map((item: any) => (
+                    {payload.map((item: TooltipPayload) => (
                       <div key={item.name} className="text-sm text-white flex items-center gap-2">
                         <div
                           className="w-2 h-2 rounded-full"

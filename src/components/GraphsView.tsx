@@ -23,7 +23,9 @@ const metrics = [
 ] as const
 
 const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['moodRating'])
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
+    'moodRating',
+  ])
   const [dateRange, setDateRange] = useState({
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       .toISOString()
@@ -41,9 +43,7 @@ const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
 
   const toggleMetric = (key: string) => {
     setSelectedMetrics((prev) =>
-      prev.includes(key)
-        ? prev.filter((k) => k !== key)
-        : [...prev, key]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     )
   }
 
@@ -89,6 +89,7 @@ const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
           <button
             key={key}
             onClick={() => toggleMetric(key)}
+            style={{ borderColor: color }}
             className={`px-3 py-1 rounded-full text-sm transition-colors ${
               selectedMetrics.includes(key)
                 ? 'bg-pink-light text-white'
@@ -103,7 +104,7 @@ const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
       <div>
         <CombinedGraph
           entries={filteredEntries}
-          metrics={metrics.filter(m => selectedMetrics.includes(m.key))}
+          metrics={metrics.filter((m) => selectedMetrics.includes(m.key))}
         />
       </div>
     </div>
