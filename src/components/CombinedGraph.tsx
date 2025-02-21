@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
-import { Payload } from 'recharts/types/component/DefaultTooltipContent'
+import { TooltipProps } from 'recharts'
 
 interface CombinedGraphProps {
   entries: MoodEntry[]
@@ -23,16 +23,13 @@ interface CombinedGraphProps {
   }>
 }
 
-interface TooltipPayload extends Payload<number, string> {
-  name: string
-  value: number
-  color: string
-}
-
 const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
   const graphData = useMemo(() => {
     return entries
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      )
       .map((entry) => ({
         ...entry,
         date: entry.timestamp,
@@ -67,7 +64,11 @@ const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
             tick={{ fill: '#ffffff60' }}
           />
           <Tooltip
-            content={({ active, payload, label }) => {
+            content={({
+              active,
+              payload,
+              label,
+            }: TooltipProps<number, string>) => {
               if (active && payload && payload.length) {
                 return (
                   <div className="bg-pink-dark border border-pink-light rounded-lg p-3 shadow-lg">
@@ -78,12 +79,17 @@ const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
                       })}
                     </div>
                     {payload.map((item) => (
-                      <div key={item.name} className="text-sm text-white flex items-center gap-2">
+                      <div
+                        key={item.name}
+                        className="text-sm text-white flex items-center gap-2"
+                      >
                         <div
                           className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: item.color }}
+                          style={{ backgroundColor: item.stroke }}
                         />
-                        <span>{item.name}: {item.value}</span>
+                        <span>
+                          {item.name}: {item.value}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -95,7 +101,9 @@ const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
           <Legend
             verticalAlign="top"
             height={36}
-            formatter={(value) => <span className="text-white/60">{value}</span>}
+            formatter={(value) => (
+              <span className="text-white/60">{value}</span>
+            )}
           />
           {metrics.map(({ key, label, color }) => (
             <Line
