@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { Payload } from 'recharts/types/component/DefaultTooltipContent'
 
 interface CombinedGraphProps {
   entries: MoodEntry[]
@@ -22,7 +23,7 @@ interface CombinedGraphProps {
   }>
 }
 
-interface TooltipPayload {
+interface TooltipPayload extends Payload<number, string> {
   name: string
   value: number
   color: string
@@ -76,7 +77,7 @@ const CombinedGraph = ({ entries, metrics }: CombinedGraphProps) => {
                         day: 'numeric',
                       })}
                     </div>
-                    {payload.map((item: TooltipPayload) => (
+                    {payload.map((item) => (
                       <div key={item.name} className="text-sm text-white flex items-center gap-2">
                         <div
                           className="w-2 h-2 rounded-full"
