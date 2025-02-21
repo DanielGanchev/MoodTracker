@@ -21,7 +21,11 @@ export default function Login() {
   return (
     <div className="w-full max-w-md bg-pink-dark rounded-3xl p-6 space-y-8">
       <h1 className="text-2xl font-bold text-white text-center">Login</h1>
-      {error && <div className="text-red-500">{error}</div>}
+      {error && (
+        <div className="bg-red-500/20 text-red-200 p-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-white text-sm mb-2">Username</label>
