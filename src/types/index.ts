@@ -7,8 +7,9 @@ export interface MoodEntry {
   moodRating: MoodRating
   sleepQuality: number
   hadDream: boolean
+  hasPeriod: boolean
+  hasOvulation: boolean
   description: string
-  hasPeriod?: boolean
   motivation: number
   energyLevel: number
   productivity: number
@@ -16,6 +17,7 @@ export interface MoodEntry {
   appetite: number
   sexDrive: number
   cravings: number
+  mindClarity: number
 }
 
 export const getMoodLabel = (rating: MoodRating): string => {

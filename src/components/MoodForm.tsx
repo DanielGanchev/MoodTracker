@@ -41,11 +41,13 @@ const MoodForm = ({
   onCancel,
   initialValues,
 }: MoodFormProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<MoodEntry, 'id'>>({
+    timestamp: initialValues?.timestamp || new Date().toISOString(),
     moodRating: selectedMood,
     sleepQuality: initialValues?.sleepQuality || 5,
     hadDream: initialValues?.hadDream || false,
     hasPeriod: initialValues?.hasPeriod || false,
+    hasOvulation: initialValues?.hasOvulation || false,
     description: initialValues?.description || '',
     motivation: initialValues?.motivation ?? 5,
     energyLevel: initialValues?.energyLevel ?? 5,
@@ -54,6 +56,7 @@ const MoodForm = ({
     appetite: initialValues?.appetite ?? 5,
     sexDrive: initialValues?.sexDrive ?? 5,
     cravings: initialValues?.cravings ?? 5,
+    mindClarity: initialValues?.mindClarity || 5,
   })
 
   useEffect(() => {
@@ -73,6 +76,7 @@ const MoodForm = ({
       hadDream: formData.hadDream,
       description: formData.description,
       hasPeriod: formData.hasPeriod,
+      hasOvulation: formData.hasOvulation,
       motivation: formData.motivation,
       energyLevel: formData.energyLevel,
       productivity: formData.productivity,
@@ -80,6 +84,7 @@ const MoodForm = ({
       appetite: formData.appetite,
       sexDrive: formData.sexDrive,
       cravings: formData.cravings,
+      mindClarity: formData.mindClarity,
     })
   }
 
@@ -206,6 +211,26 @@ const MoodForm = ({
               </div>
             </label>
 
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="hasOvulation"
+                checked={formData.hasOvulation}
+                disabled={formData.hasPeriod}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    hasOvulation: e.target.checked,
+                    hasPeriod: e.target.checked ? false : prev.hasPeriod,
+                  }))
+                }
+                className="rounded border-pink-light text-pink-600 focus:ring-pink-500"
+              />
+              <label htmlFor="hasOvulation" className="text-white text-sm">
+                Ovulation Day
+              </label>
+            </div>
+
             <label className="block">
               <span className="text-white/90 text-sm mb-2 block font-medium">
                 Description
@@ -223,6 +248,30 @@ const MoodForm = ({
                 placeholder="How are you feeling? What's on your mind?"
               />
             </label>
+
+            <div>
+              <label className="block text-white text-sm mb-2">
+                Mind Clarity
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={formData.mindClarity}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    mindClarity: Number(e.target.value),
+                  }))
+                }
+                className="w-full accent-pink-600"
+              />
+              <div className="flex justify-between text-white/60 text-xs">
+                <span>1</span>
+                <span>5</span>
+                <span>10</span>
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-4">

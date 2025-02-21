@@ -79,6 +79,8 @@ const MoodTracker = () => {
         hadDream: false,
         description: '',
         hasPeriod: false,
+        hasOvulation: false,
+        mindClarity: 5,
         motivation: 5,
         energyLevel: 5,
         productivity: 5,
