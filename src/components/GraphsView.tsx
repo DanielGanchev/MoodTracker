@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MoodEntry } from '@/types'
 import CombinedGraph from './CombinedGraph'
 
@@ -9,37 +9,180 @@ interface GraphsViewProps {
   onBack: () => void
 }
 
+// Define the metrics with their exact data keys that match the MoodEntry type
 const metrics = [
-  { key: 'moodRating', label: 'Mood', color: '#f472b6' },
-  { key: 'mindClarity', label: 'Mind Clarity', color: '#a78bfa' },
+  { key: 'mood', label: 'Mood', color: '#f472b6' },
+  { key: 'mind_clarity', label: 'Mind Clarity', color: '#a78bfa' },
   { key: 'motivation', label: 'Motivation', color: '#60a5fa' },
-  { key: 'energyLevel', label: 'Energy', color: '#34d399' },
+  { key: 'energy', label: 'Energy', color: '#34d399' },
   { key: 'productivity', label: 'Productivity', color: '#fbbf24' },
-  { key: 'emotionalStability', label: 'Emotional Stability', color: '#f87171' },
+  {
+    key: 'emotional_stability',
+    label: 'Emotional Stability',
+    color: '#f87171',
+  },
+  { key: 'focus', label: 'Focus', color: '#000000' },
   { key: 'appetite', label: 'Appetite', color: '#fb923c' },
-  { key: 'sexDrive', label: 'Sex Drive', color: '#e879f9' },
+  { key: 'sex_drive', label: 'Sex Drive', color: '#e879f9' },
   { key: 'cravings', label: 'Cravings', color: '#22c55e' },
-  { key: 'sleepQuality', label: 'Sleep Quality', color: '#818cf8' },
+  { key: 'sleep_quality', label: 'Sleep Quality', color: '#818cf8' },
 ] as const
 
-const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
-    'moodRating',
-  ])
-  const [dateRange, setDateRange] = useState({
-    start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0],
-    end: new Date().toISOString().split('T')[0],
-  })
+// Interface for potential alternative property names
+interface AlternateFormatEntry {
+  mindClarity?: number
+  emotionalStability?: number
+  sexDrive?: number
+  focus?: number
+}
 
-  const filteredEntries = entries.filter((entry) => {
-    const entryDate = new Date(entry.timestamp)
+const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['mood'])
+  const [dateRange, setDateRange] = useState({
+    start: '',
+    end: '',
+  })
+  const [isClient, setIsClient] = useState(false)
+  const [processedEntries, setProcessedEntries] = useState<MoodEntry[]>([])
+
+  useEffect(() => {
+    setIsClient(true)
+    setDateRange({
+      start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
+      end: new Date().toISOString().split('T')[0],
+    })
+
+    // Log entries to debug
+    console.log('Initial entries in GraphsView:', entries)
+
+    // Specifically check the problematic fields
+    if (entries.length > 0) {
+      console.log('First entry data check:')
+      console.log('- mind_clarity:', entries[0].mind_clarity)
+      console.log('- emotional_stability:', entries[0].emotional_stability)
+      console.log('- sex_drive:', entries[0].sex_drive)
+      console.log('- focus:', entries[0].focus)
+
+      // Check all available properties on first entry
+      console.log('All properties on first entry:', Object.keys(entries[0]))
+    }
+  }, [entries])
+
+  useEffect(() => {
+    // Filter and process entries based on date range
+    if (!dateRange.start || !dateRange.end || !entries.length) {
+      setProcessedEntries([])
+      return
+    }
+
     const startDate = new Date(dateRange.start)
     const endDate = new Date(dateRange.end)
     endDate.setHours(23, 59, 59, 999)
-    return entryDate >= startDate && entryDate <= endDate
-  })
+
+    const filtered = entries
+      .filter((entry) => {
+        const entryDate = new Date(entry.date)
+        return entryDate >= startDate && entryDate <= endDate
+      })
+      .map((entry) => {
+        // Create a copy of the entry for processing
+        const processedEntry = { ...entry }
+
+        // Ensure all required metrics are present
+        metrics.forEach((metric) => {
+          const metricKey = metric.key as keyof MoodEntry
+
+          // Check for specific troublesome fields
+          if (
+            metricKey === 'mind_clarity' &&
+            processedEntry.mind_clarity === undefined
+          ) {
+            // Try alternate property names using type assertion
+            const alternateEntry =
+              processedEntry as unknown as AlternateFormatEntry
+            if (alternateEntry.mindClarity !== undefined) {
+              processedEntry.mind_clarity = alternateEntry.mindClarity
+              console.log(
+                `Fixed mind_clarity using mindClarity: ${processedEntry.mind_clarity}`
+              )
+            } else {
+              processedEntry.mind_clarity = 5 // Use 5 as default based on user's feedback
+              console.log('Set default mind_clarity to 5')
+            }
+          }
+
+          if (
+            metricKey === 'emotional_stability' &&
+            processedEntry.emotional_stability === undefined
+          ) {
+            // Try alternate property names using type assertion
+            const alternateEntry =
+              processedEntry as unknown as AlternateFormatEntry
+            if (alternateEntry.emotionalStability !== undefined) {
+              processedEntry.emotional_stability =
+                alternateEntry.emotionalStability
+              console.log(
+                `Fixed emotional_stability using emotionalStability: ${processedEntry.emotional_stability}`
+              )
+            } else {
+              processedEntry.emotional_stability = 5 // Use 5 as default based on user's feedback
+              console.log('Set default emotional_stability to 5')
+            }
+          }
+
+          if (
+            metricKey === 'sex_drive' &&
+            processedEntry.sex_drive === undefined
+          ) {
+            // Try alternate property names using type assertion
+            const alternateEntry =
+              processedEntry as unknown as AlternateFormatEntry
+            if (alternateEntry.sexDrive !== undefined) {
+              processedEntry.sex_drive = alternateEntry.sexDrive
+              console.log(
+                `Fixed sex_drive using sexDrive: ${processedEntry.sex_drive}`
+              )
+            } else {
+              processedEntry.sex_drive = 5 // Use 5 as default based on user's feedback
+              console.log('Set default sex_drive to 5')
+            }
+          }
+
+          // Handle the new focus field
+          if (metricKey === 'focus' && processedEntry.focus === undefined) {
+            // Set default value for focus if not present
+            processedEntry.focus = 5 // Use 5 as default based on user's feedback
+            console.log('Set default focus to 5')
+          }
+
+          // General fallback for all metrics
+          if (processedEntry[metricKey] === undefined) {
+            // @ts-ignore - we're adding properties that might not be in the type but should be in the data
+            processedEntry[metricKey] = 5 // Use 5 as default based on user's feedback
+            console.log(`Set missing ${metricKey} to 5`)
+          }
+        })
+
+        console.log('Processed entry:', {
+          date: processedEntry.date,
+          mood: processedEntry.mood,
+          mind_clarity: processedEntry.mind_clarity,
+          emotional_stability: processedEntry.emotional_stability,
+          sex_drive: processedEntry.sex_drive,
+          focus: processedEntry.focus,
+        })
+
+        return processedEntry
+      })
+
+    console.log(
+      'Filtered entries sample:',
+      filtered.length > 0 ? filtered[0] : 'No entries'
+    )
+    setProcessedEntries(filtered)
+  }, [entries, dateRange.start, dateRange.end])
 
   const toggleMetric = (key: string) => {
     setSelectedMetrics((prev) =>
@@ -85,27 +228,36 @@ const GraphsView = ({ entries, onBack }: GraphsViewProps) => {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {metrics.map(({ key, label, color }) => (
-          <button
-            key={key}
-            onClick={() => toggleMetric(key)}
-            style={{ borderColor: color }}
-            className={`px-3 py-1 rounded-full text-sm transition-colors ${
-              selectedMetrics.includes(key)
-                ? 'bg-pink-light text-white'
-                : 'bg-pink-medium/30 text-white/60'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+        {metrics.map(({ key, label, color }) => {
+          const isSelected = selectedMetrics.includes(key)
+
+          return (
+            <button
+              key={key}
+              onClick={() => toggleMetric(key)}
+              className={`px-4 py-2 rounded-full ${
+                isSelected ? 'bg-white/90 font-medium shadow-sm' : 'bg-white/70'
+              }`}
+              style={{ color: color }}
+              aria-pressed={isSelected}
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
 
       <div>
-        <CombinedGraph
-          entries={filteredEntries}
-          metrics={metrics.filter((m) => selectedMetrics.includes(m.key))}
-        />
+        {processedEntries.length > 0 ? (
+          <CombinedGraph
+            entries={processedEntries}
+            metrics={metrics.filter((m) => selectedMetrics.includes(m.key))}
+          />
+        ) : (
+          <div className="h-64 w-full flex items-center justify-center text-white/70">
+            No data available for the selected date range
+          </div>
+        )}
       </div>
     </div>
   )

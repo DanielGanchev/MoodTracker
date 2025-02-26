@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     return (
       <div className="rounded-lg border border-purple-700 bg-purple-950 p-2 shadow-lg">
         <div className="text-sm text-white">
-          Sleep Quality: {entry.sleepQuality}
+          Sleep Quality: {entry.sleep_quality}
         </div>
         <div className="mt-1 text-xs text-white/60">
           {label &&
@@ -50,13 +50,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
 const SleepGraph = ({ entries }: SleepGraphProps) => {
   const graphData = useMemo(() => {
     return entries
-      .sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map((entry) => ({
         ...entry,
-        date: entry.timestamp,
+        date: entry.date,
       }))
   }, [entries])
 
@@ -91,7 +88,7 @@ const SleepGraph = ({ entries }: SleepGraphProps) => {
           <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
-            dataKey="sleepQuality"
+            dataKey="sleep_quality"
             stroke="#a855f7"
             strokeWidth={2}
             dot={{

@@ -48,11 +48,13 @@ module.exports = {
         },
         pink: {
           lightest: '#FFE5EC', // misty-rose
-          light: '#FFC2D1',    // pink
-          medium: '#FFB3C6',   // cherry-blossom
-          DEFAULT: '#FF8FAB',  // bakermiller
-          dark: '#FB6F92',     // rose-pompadour
-        }
+          light: '#FFC2D1', // pink
+          medium: '#FFB3C6', // cherry-blossom
+          DEFAULT: '#FF8FAB', // bakermiller
+          dark: '#FB6F92', // rose-pompadour
+        },
+        period: '#fecaca', // Light red
+        ovulation: '#fbcfe8', // Light pink
       },
     },
   },

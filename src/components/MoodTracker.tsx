@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { MoodEntry, MoodRating, getMoodLabel, getMoodEmoji } from '@/types'
 import useMoodEntries from '@/hooks/useMoodEntries'
 import MoodForm from './MoodForm'
@@ -8,17 +8,26 @@ import CalendarView from './CalendarView'
 import StatsView from './StatsView'
 import GraphsView from './GraphsView'
 import { useAuth } from '@/contexts/AuthContext'
+import PDFExportModal from './PDFExportModal'
 
 type View = 'mood' | 'calendar' | 'stats' | 'graphs'
 
 const MoodTracker = () => {
-  const { signOut } = useAuth()
+  const { signOut, profile } = useAuth()
   const [selectedMood, setSelectedMood] = useState<MoodRating | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [currentView, setCurrentView] = useState<View>('mood')
   const [selectedEntry, setSelectedEntry] = useState<MoodEntry | null>(null)
+  const [showPDFExportModal, setShowPDFExportModal] = useState(false)
 
-  const { entries, addEntry, updateEntry } = useMoodEntries()
+  const { entries, addEntry, updateEntry, refreshEntries } = useMoodEntries()
+
+  // Add effect to refresh entries when component mounts
+  useEffect(() => {
+    if (profile) {
+      refreshEntries()
+    }
+  }, [profile, refreshEntries])
 
   const moodOptions: Array<{
     rating: MoodRating
@@ -39,58 +48,129 @@ const MoodTracker = () => {
     setSelectedMood(rating)
   }
 
-  const handleSubmitEntry = (
+  const handleSubmitEntry = async (
     entryData: Omit<MoodEntry, 'id'> & { id?: string }
   ) => {
-    if (entryData.id) {
-      // If we have an ID, it's an update
-      updateEntry({
-        ...entryData,
-        id: entryData.id,
-      } as MoodEntry)
-    } else {
-      // If no ID, it's a new entry
-      addEntry({
-        ...entryData,
-        timestamp: entryData.timestamp || new Date().toISOString(),
-      })
+    // Guard against operations without a valid profile
+    if (!profile || !profile.id) {
+      console.error('Cannot save entry: No valid profile')
+      alert('Please log in again to save entries.')
+      return
     }
-    setShowForm(false)
-    setSelectedEntry(null)
+
+    // Make sure profile_id is always the current user's profile ID
+    const dataWithCorrectProfileId = {
+      ...entryData,
+      profile_id: profile.id,
+      // Ensure checkbox values are explicit booleans
+      had_dream: entryData.had_dream === true,
+      has_period: entryData.has_period === true,
+      has_ovulation: entryData.has_ovulation === true,
+    }
+
+    console.log('Submitting entry with correct data:', dataWithCorrectProfileId)
+
+    try {
+      let result
+      if (entryData.id && entryData.id !== 'new') {
+        // If we have a real ID (not 'new'), it's an update
+        console.log('Updating entry with ID:', entryData.id)
+        result = await updateEntry({
+          ...dataWithCorrectProfileId,
+          id: entryData.id,
+        } as MoodEntry)
+      } else {
+        // If no ID or ID is 'new', it's a new entry - remove the id
+        const { id, ...newEntryData } = dataWithCorrectProfileId
+        console.log('Adding new entry with profile_id:', profile.id)
+        result = await addEntry({
+          ...newEntryData,
+          date: entryData.date || new Date().toISOString(),
+        })
+      }
+
+      // Close the form
+      setShowForm(false)
+      setSelectedEntry(null)
+
+      // Always manually refresh entries after submission to ensure UI is updated
+      console.log('Refreshing entries after form submission')
+      await refreshEntries()
+
+      console.log('Form submission complete, result:', result)
+    } catch (error) {
+      console.error('Error saving entry:', error)
+      alert('There was an error saving your entry. Please try again.')
+    }
   }
 
   const handleDayClick = (entry: MoodEntry | null, date: Date) => {
     if (entry) {
       // If there's an existing entry, edit it
+      console.log('Editing existing entry:', entry)
+      console.log('Entry has boolean values:', {
+        had_dream: entry.had_dream === true,
+        has_period: entry.has_period === true,
+        has_ovulation: entry.has_ovulation === true,
+      })
+
       setSelectedEntry(entry)
-      setSelectedMood(entry.moodRating)
+      setSelectedMood(entry.mood as MoodRating)
       setShowForm(true)
     } else {
       // If no entry exists, create a new one
+      // Check if profile is available first
+      if (!profile || !profile.id) {
+        console.error('Cannot create new entry: No valid profile')
+        alert('Please log in again to create entries.')
+        return
+      }
+
       setSelectedEntry(null)
-      setSelectedMood(5) // Default mood value
-      setShowForm(true)
+      setSelectedMood(5 as MoodRating) // Default mood value
+
       // Set the timestamp to the clicked date
       const newDate = new Date(date)
       newDate.setHours(12, 0, 0, 0) // Set to noon to avoid timezone issues
-      setSelectedEntry({
-        id: '',
-        timestamp: newDate.toISOString(),
-        moodRating: 5 as MoodRating,
-        sleepQuality: 5,
-        hadDream: false,
-        description: '',
-        hasPeriod: false,
-        hasOvulation: false,
-        mindClarity: 5,
+
+      // Create a new entry with default values
+      const newEntry: MoodEntry = {
+        id: 'new', // Use 'new' as a temporary ID to indicate this is a new entry
+        date: newDate.toISOString(),
+        mood: 5 as MoodRating,
+        sleep_quality: 5,
+        mind_clarity: 5,
         motivation: 5,
-        energyLevel: 5,
+        energy: 5,
         productivity: 5,
-        emotionalStability: 5,
+        emotional_stability: 5,
         appetite: 5,
-        sexDrive: 5,
+        sex_drive: 5,
         cravings: 5,
-      })
+        notes: '',
+        created_at: '', // Empty string initially
+        updated_at: '', // Empty string initially
+        profile_id: profile.id, // Use profile.id directly since we checked it exists
+        has_period: false,
+        has_ovulation: false,
+        had_dream: false,
+      }
+
+      // Update timestamps in state after render
+      setSelectedEntry(newEntry)
+      setShowForm(true)
+
+      // Update timestamps client-side only
+      setTimeout(() => {
+        setSelectedEntry((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
+        })
+      }, 0)
     }
   }
 
@@ -231,12 +311,12 @@ const MoodTracker = () => {
                 <span className="text-xs">Stats</span>
               </button>
               <button
-                className="flex flex-col items-center space-y-1 hover:text-white transition-colors opacity-50 cursor-not-allowed"
-                disabled
-                aria-label="Profile (coming soon)"
+                className="flex flex-col items-center space-y-1 hover:text-white transition-colors"
+                onClick={() => setShowPDFExportModal(true)}
+                aria-label="Export to PDF"
               >
                 <span className="text-xl">👤</span>
-                <span className="text-xs">Profile</span>
+                <span className="text-xs">Export PDF</span>
               </button>
             </div>
           </div>
@@ -250,13 +330,20 @@ const MoodTracker = () => {
 
       {showForm && (selectedMood || selectedEntry) && (
         <MoodForm
-          selectedMood={selectedMood || selectedEntry!.moodRating}
+          selectedMood={selectedMood || (selectedEntry!.mood as MoodRating)}
           onSubmit={handleSubmitEntry}
           onCancel={() => {
             setShowForm(false)
             setSelectedEntry(null)
           }}
           initialValues={selectedEntry}
+        />
+      )}
+
+      {showPDFExportModal && (
+        <PDFExportModal
+          isOpen={showPDFExportModal}
+          onClose={() => setShowPDFExportModal(false)}
         />
       )}
     </div>

@@ -18,17 +18,38 @@ const StatsView = ({ entries, onBack }: StatsViewProps) => {
   }
 
   const stats = [
-    { label: 'Mood', value: calculateAverage('moodRating') },
-    { label: 'Mind Clarity', value: calculateAverage('mindClarity') },
+    { label: 'Mood', value: calculateAverage('mood') },
+    { label: 'Mind Clarity', value: calculateAverage('mind_clarity') },
     { label: 'Motivation', value: calculateAverage('motivation') },
-    { label: 'Energy', value: calculateAverage('energyLevel') },
+    { label: 'Energy', value: calculateAverage('energy') },
     { label: 'Productivity', value: calculateAverage('productivity') },
-    { label: 'Emotional Stability', value: calculateAverage('emotionalStability') },
+    {
+      label: 'Emotional Stability',
+      value: calculateAverage('emotional_stability'),
+    },
   ]
 
-  const periodDays = entries.filter(entry => entry.hasPeriod).length
-  const ovulationDays = entries.filter(entry => entry.hasOvulation).length
-  const dreamDays = entries.filter(entry => entry.hadDream).length
+  const periodDays = entries.filter((entry) => entry.has_period === true).length
+  const ovulationDays = entries.filter(
+    (entry) => entry.has_ovulation === true
+  ).length
+  const dreamDays = entries.filter((entry) => entry.had_dream === true).length
+
+  const periodDaysFromNotes = entries.filter(
+    (entry) =>
+      !entry.has_period && entry.notes?.toLowerCase().includes('period')
+  ).length
+  const ovulationDaysFromNotes = entries.filter(
+    (entry) =>
+      !entry.has_ovulation && entry.notes?.toLowerCase().includes('ovulation')
+  ).length
+  const dreamDaysFromNotes = entries.filter(
+    (entry) => !entry.had_dream && entry.notes?.toLowerCase().includes('dream')
+  ).length
+
+  const totalPeriodDays = periodDays + periodDaysFromNotes
+  const totalOvulationDays = ovulationDays + ovulationDaysFromNotes
+  const totalDreamDays = dreamDays + dreamDaysFromNotes
 
   return (
     <div className="w-full max-w-md bg-pink-dark rounded-3xl p-6 space-y-8">
@@ -59,15 +80,15 @@ const StatsView = ({ entries, onBack }: StatsViewProps) => {
         <div className="space-y-2">
           <div className="flex justify-between text-white">
             <span>Period Days</span>
-            <span>{periodDays}</span>
+            <span>{totalPeriodDays}</span>
           </div>
           <div className="flex justify-between text-white">
             <span>Ovulation Days</span>
-            <span>{ovulationDays}</span>
+            <span>{totalOvulationDays}</span>
           </div>
           <div className="flex justify-between text-white">
             <span>Dream Days</span>
-            <span>{dreamDays}</span>
+            <span>{totalDreamDays}</span>
           </div>
         </div>
       </div>

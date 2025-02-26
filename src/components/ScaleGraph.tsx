@@ -60,13 +60,10 @@ const ScaleGraph = ({
 }: ScaleGraphProps) => {
   const graphData = useMemo(() => {
     return entries
-      .sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map((entry) => ({
         ...entry,
-        date: entry.timestamp,
+        date: entry.date,
       }))
   }, [entries])
 

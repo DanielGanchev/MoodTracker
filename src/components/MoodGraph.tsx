@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { MoodEntry, getMoodEmoji } from '@/types'
+import { MoodEntry, getMoodEmoji, MoodRating } from '@/types'
 import {
   LineChart,
   Line,
@@ -31,8 +31,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     return (
       <div className="rounded-lg border border-purple-700 bg-purple-950 p-2 shadow-lg">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{getMoodEmoji(entry.moodRating)}</span>
-          <span className="text-sm text-white">{entry.moodRating}</span>
+          <span className="text-lg">
+            {getMoodEmoji(entry.mood as MoodRating)}
+          </span>
+          <span className="text-sm text-white">{entry.mood}</span>
         </div>
         <div className="mt-1 text-xs text-white/60">
           {label &&
@@ -51,13 +53,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
 const MoodGraph = ({ entries }: MoodGraphProps) => {
   const graphData = useMemo(() => {
     return entries
-      .sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .map((entry) => ({
         ...entry,
-        date: entry.timestamp,
+        date: entry.date,
       }))
   }, [entries])
 
@@ -91,7 +90,7 @@ const MoodGraph = ({ entries }: MoodGraphProps) => {
           <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
-            dataKey="moodRating"
+            dataKey="mood"
             stroke="#a855f7"
             strokeWidth={2}
             dot={{
