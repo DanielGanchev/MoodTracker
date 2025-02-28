@@ -11,21 +11,21 @@ interface GraphsViewProps {
 
 // Define the metrics with their exact data keys that match the MoodEntry type
 const metrics = [
-  { key: 'mood', label: 'Mood', color: '#f472b6' },
-  { key: 'mind_clarity', label: 'Mind Clarity', color: '#a78bfa' },
-  { key: 'motivation', label: 'Motivation', color: '#60a5fa' },
-  { key: 'energy', label: 'Energy', color: '#34d399' },
-  { key: 'productivity', label: 'Productivity', color: '#fbbf24' },
+  { key: 'mood', label: 'Mood', color: '#e6194B' },
+  { key: 'mind_clarity', label: 'Mind Clarity', color: '#f58231' },
+  { key: 'motivation', label: 'Motivation', color: '#dcbeff' },
+  { key: 'energy', label: 'Energy', color: '#808000' },
+  { key: 'productivity', label: 'Productivity', color: '#3cb44b' },
   {
     key: 'emotional_stability',
     label: 'Emotional Stability',
-    color: '#f87171',
+    color: '#000075',
   },
-  { key: 'focus', label: 'Focus', color: '#000000' },
-  { key: 'appetite', label: 'Appetite', color: '#fb923c' },
-  { key: 'sex_drive', label: 'Sex Drive', color: '#e879f9' },
-  { key: 'cravings', label: 'Cravings', color: '#22c55e' },
-  { key: 'sleep_quality', label: 'Sleep Quality', color: '#818cf8' },
+  { key: 'focus', label: 'Focus', color: '#42d4f4' },
+  { key: 'appetite', label: 'Appetite', color: '#4363d8' },
+  { key: 'sex_drive', label: 'Sex Drive', color: '#911eb4' },
+  { key: 'cravings', label: 'Cravings', color: '#000000' },
+  { key: 'sleep_quality', label: 'Sleep Quality', color: '#a9a9a9' },
 ] as const
 
 // Interface for potential alternative property names
